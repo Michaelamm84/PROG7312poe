@@ -1,6 +1,7 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using PROGPOEDH.Models;
+using System.Diagnostics;
 
 namespace PROGPOEDH.Controllers
 {
@@ -22,6 +23,18 @@ namespace PROGPOEDH.Controllers
         {
             return View();
         }
+
+        public IActionResult reportIssue() {
+
+            return View("Views/Home/ReportIssueView.cshtml");
+        }
+
+        public IActionResult ShowReports()
+        {
+            return View();
+
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

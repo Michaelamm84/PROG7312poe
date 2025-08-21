@@ -1,0 +1,23 @@
+﻿@model IEnumerable<PROGPOEDH.Models.FormModel>
+
+<h2>All Reports</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Location</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var report in Model)
+        {
+            <tr>
+                <td>@report.Location</td>
+                <td>@report.Name</td>
+                <td>@report.Description</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -2,7 +2,107 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@{
+    ViewBag.Title = "Home";
+}
+
+
+<div class="container my-4" style="font-family: Arial, sans-serif;">
+
+    <!-- Welcome Banner -->
+    <div class="p-5 mb-4 rounded-3" style="background: linear-gradient(90deg, #007847, #FFD100, #E23D28, #002395); color: white;">
+        <div class="container-fluid py-3">
+            <h1 class="display-5 fw-bold">Welcome to Our Community Portal</h1>
+            <p class="col-md-8 fs-5">Stay connected, informed, and engaged with local updates and services.</p>
+        </div>
+    </div>
+
+    <!-- Main Options -->
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm" style="border-top: 5px solid #007847;">
+                <div class="card-body">
+                    <h4 class="card-title">Report Issues</h4>
+                    <p class="card-text">Let us know about any problems in your area.</p>
+                    <a href="@Url.Action("reportIssue", "Home")" class="btn btn-success">
+                        Report Issue
+                    </a>
+                    <button class="btn" style="background-color: #FFD100; color: black; font-weight: bold;">Coming Soon</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm" style="border-top: 5px solid #007847;">
+                <div class="card-body">
+                    <h4 class="card-title">View Issues</h4>
+                    <p class="card-text">Click is view all reports.</p>
+                    <a href="@Url.Action("ShowReports", "Home")" class="btn btn-success">
+                        ShowReports
+                    </a>
+                    <button class="btn" style="background-color: #FFD100; color: black; font-weight: bold;">Coming Soon</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm" style="border-top: 5px solid #E23D28;">
+                <div class="card-body">
+                    <h4 class="card-title">Local Events & Announcements</h4>
+                    <p class="card-text">Stay informed about what's happening around you.</p>
+                    <button class="btn" style="background-color: #FFD100; color: black; font-weight: bold;">Coming Soon</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm" style="border-top: 5px solid #002395;">
+                <div class="card-body">
+                    <h4 class="card-title">Service Request Status</h4>
+                    <p class="card-text">Check progress on your service requests.</p>
+                    <button class="btn" style="background-color: #FFD100; color: black; font-weight: bold;">Coming Soon</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- News & Announcements -->
+    <h3 class="mb-3" style="color: #007847;">Latest Community News</h3>
+    <div class="list-group mb-4">
+        <a href="#" class="list-group-item list-group-item-action">
+            🌳 Tree Planting Day – Join us this Saturday at the park!
+        </a>
+        <a href="#" class="list-group-item list-group-item-action">
+            🚧 Roadworks Notice – Main Street closed from Aug 20 to Sep 5.
+        </a>
+        <a href="#" class="list-group-item list-group-item-action">
+            🏆 Local Soccer Team Wins Regional Championship!
+        </a>
+    </div>
+
+    <!-- Quick Links -->
+    <h3 class="mb-3" style="color: #E23D28;">Quick Links</h3>
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="#" class="btn btn-outline-success">Municipal Contacts</a>
+        <a href="#" class="btn btn-outline-warning">Emergency Numbers</a>
+        <a href="#" class="btn btn-outline-primary">Local Businesses</a>
+        <a href="#" class="btn btn-outline-danger">Volunteer Opportunities</a>
+    </div>
+
+    <!-- Community Tips -->
+    <div class="p-4 rounded shadow-sm" style="background-color: #f5f5f5;">
+        <h4 style="color: #002395;">Community Tip of the Week</h4>
+        <p>Remember to separate your recycling into paper, plastic, and glass. Together, we can make a greener South Africa!</p>
+    </div>
+
+    <!-- Footer with SA Flag Colors -->
+    <div class="d-flex mt-5" style="height: 20px;">
+        <div style="flex: 1; background-color: #007847;"></div>
+        <div style="flex: 1; background-color: #FFD100;"></div>
+        <div style="flex: 1; background-color: black;"></div>
+        <div style="flex: 1; background-color: #E23D28;"></div>
+        <div style="flex: 1; background-color: #002395;"></div>
+        <div style="flex: 1; background-color: white;"></div>
+    </div>
 </div>
+
