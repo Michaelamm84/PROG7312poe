@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using PROGPOEDH.Models;
 using System.Diagnostics;
+using PROGPOEDH.Services;
 
 namespace PROGPOEDH.Controllers
 {
@@ -29,9 +30,24 @@ namespace PROGPOEDH.Controllers
             return View("Views/Home/ReportIssueView.cshtml");
         }
 
+        public IActionResult Populate()
+        {
+            FormController.reports.PopulateList();
+            var allreports = FormController.reports.GetAllReports();
+            return View("Views/Home/ShowReports.cshtml" ,allreports);
+            
+        }
+
+        public IActionResult deleteView()
+        {
+            return View("Views/Home/DeleteNode.cshtml");
+        }
         public IActionResult ShowReports()
         {
-            return View();
+            var list = FormController.reports.GetAllReports();
+
+            return View("Views/Home/ShowReports.cshtml", list);
+            
 
         }
 

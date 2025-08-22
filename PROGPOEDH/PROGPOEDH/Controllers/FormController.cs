@@ -7,7 +7,8 @@ namespace PROGPOEDH.Controllers
 {
     public class FormController : Controller
     {
-        private static ReportLinkedList reports = new ReportLinkedList();
+        // static forces all references of the class to use this list 
+        public static ReportLinkedList reports = new ReportLinkedList();
 
         [HttpGet]
         public IActionResult ReportIssue()
@@ -36,8 +37,16 @@ namespace PROGPOEDH.Controllers
             return View("Views/Home/ShowReports.cshtml", allReports); // pass list of FormModel to view
         }
 
+        [HttpPost]
+        public IActionResult DeleteReport(string Name)
+        {
+            reports.DeleteNode(Name);
+
+            return RedirectToAction("AllReports");
+
+        }
+        // static so it persists between requests
+
+
     }
-    // static so it persists between requests
-
-
 }

@@ -1,4 +1,5 @@
-﻿using PROGPOEDH.Models;
+﻿using PROGPOEDH.Controllers;
+using PROGPOEDH.Models;
 using System.Xml.Linq;
 
 namespace PROGPOEDH.Services
@@ -7,10 +8,12 @@ namespace PROGPOEDH.Services
     //creating the structure of the node within my linked list
     public class ReportNode
     {
-        
-        public string Name {  get; set; }
+
+        public string Name { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
+
+        public byte[] Data { get; set; }
 
         //the next feature refernces the next node within the linked list allowing them to be "linked"
         public ReportNode Next { get; set; }
@@ -59,8 +62,8 @@ namespace PROGPOEDH.Services
             }
             else
             {
-                Tail.Next = newNode;
-                Tail = newNode;
+                Tail.Next = newNode; //links previous node to current node
+                Tail = newNode;// makes new node the tail 
             }
         }
 
@@ -80,7 +83,47 @@ namespace PROGPOEDH.Services
             }
             return list;
 
-        }     
-    }     
+        }
+
+        public void DeleteNode(string Name)
+        {
+            if (FormController.reports.Head == null)
+                return;
+
+            // Special case: deleting the head node
+            if (FormController.reports.Head.Name == Name)
+            {
+                FormController.reports.Head = FormController.reports.Head.Next;
+                return;
+            }
+
+
+            var current = FormController.reports.Head;
+            while (current.Next != null)
+            {
+                if (current.Next.Name == Name)
+                {
+                    
+                    current.Next = current.Next.Next;
+                    return;
+                }
+                else
+                {
+                    current.Next = current;
+                }
+            }
+        }
+
+        public void PopulateList()
+        {
+            FormController.reports.AddReport("michael", "found a pothole", "cape town");
+            FormController.reports.AddReport("Dean", "found a burst pipe", "Joburg");
+            FormController.reports.AddReport("Lia", "found a car", "Durban");
+            FormController.reports.AddReport("kevin", "found a bump", "stellenbosch");
+        }
+
+
+
     }
+}
 

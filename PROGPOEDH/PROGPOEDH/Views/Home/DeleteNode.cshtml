@@ -1,0 +1,16 @@
+﻿@model PROGPOEDH.Models.FormModel
+
+<h2>Delete Report</h2>
+
+<form asp-action="DeleteReport" asp-controller="Form" method="post">
+    
+
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+   
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
