@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using PROGPOEDH.Controllers;
 using PROGPOEDH.Models;
+using System.Reflection.Metadata;
 using System.Xml.Linq;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 
 namespace PROGPOEDH.Services
@@ -16,8 +17,13 @@ namespace PROGPOEDH.Services
         public string Description { get; set; }
         public string Location { get; set; }
 
-        public byte[] Docuemnt { get; set; }
+        public byte[] Document { get; set; }
         public byte[] Picture { get; set; }
+
+        public IFormFile PictureFile { get; set; }
+
+
+
 
         public string viewPicture { get; set; }
 
@@ -25,15 +31,16 @@ namespace PROGPOEDH.Services
         public ReportNode Next { get; set; }
 
         //creating a constructor for the node 
-        public ReportNode(string Category, string Description, string Location, byte[] Docuemnt, byte[] Picture, string viewPicture )
+        public ReportNode(string Category, string Description, string Location, byte[] Document, byte[] Picture, string viewPicture, IFormFile PictureFile)
         {
             //this.id = id++;
             this.Category = Category;
             this.Description = Description;
             this.Location = Location;
-            this.Docuemnt = Docuemnt;
+            this.Document = Document;
             this.Picture = Picture;
             this.viewPicture = viewPicture;
+            this.PictureFile = PictureFile;
 
 
             //when initiating a new instance of the node the next node will always be null 
@@ -42,7 +49,7 @@ namespace PROGPOEDH.Services
         //A method to print out the Node 
         public override string ToString()
         {
-            return $"[{Location}] {Category}: {Description} : {Docuemnt}: {viewPicture}"; // added last two recently 
+            return $"[{Location}] {Category}: {Description} : {Document}: {viewPicture}"; // added last two recently 
         }
     }
 
@@ -60,9 +67,9 @@ namespace PROGPOEDH.Services
             Head = null;
             Tail = null;
         }
-        public void AddReport(string Name, string Description, string Location, byte[] Document, byte[] Picture, string viewPicture)
+        public void AddReport(string Name, string Description, string Location, byte[] Document, byte[] Picture, string viewPicture, IFormFile PictureFile)
         {
-            ReportNode newNode = new ReportNode( Name, Description, Location, Document, Picture, viewPicture);
+            ReportNode newNode = new ReportNode( Name, Description, Location, Document, Picture, viewPicture, PictureFile);
 
 
             if (Head == null) // first bvalue in linked list 
@@ -84,25 +91,23 @@ namespace PROGPOEDH.Services
 
             while (current != null)
             {
-                string pictureBase64 = null;
-                if (current.Picture != null)
-                {
-                    pictureBase64 = $"data:image/jpeg;base64,{Convert.ToBase64String(current.Picture)}";
-                }
+                /* string pictureBase64 = null;
 
-                string documentBase64 = null;
-                if (current.Docuemnt != null)
-                {
-                    documentBase64 = $"data:application/pdf;base64,{Convert.ToBase64String(current.Docuemnt)}";
-                }
+                 pictureBase64 = $"data:image/jpeg;base64,{Convert.ToBase64String(current.Picture)}";*/
+
+                // string documentBase64 = null;
+
+                //documentBase64 = $"data:application/pdf;base64,{Convert.ToBase64String(current.Document)}";
+
 
                 list.Add(new FormModel
                 {
                     Location = current.Location,
                     Category = current.Category,
                     Description = current.Description,
-                    Picture = current.Picture, // keep the raw bytes if needed
-                    viewPicture = pictureBase64 ?? documentBase64 // prefer image, fallback to pdf
+                    Picture = current.Picture,
+                    viewPicture = $"data:image/jpeg;base64,{Convert.ToBase64String(current.Picture)}",
+                    PictureFile = current.PictureFile,
                 });
 
                 current = current.Next;
@@ -182,9 +187,11 @@ namespace PROGPOEDH.Services
             {
                 Console.WriteLine("empty file error");
             }
+            /*var filePath = "wwwroot/images/test.jpg";
+            var stream = File.OpenRead(filePath);
+*/
 
-
-            FormController.reports.AddReport("michael", "found a pothole", "cape town", potHolePDF, potHolePicture, "this is string "); 
+            FormController.reports.AddReport("michael", "found a pothole", "cape town", potHolePDF, potHolePicture, "this is string", null); 
 
 
          /*   FormController.reports.AddReport("Dean", "found a burst pipe", "Joburg");

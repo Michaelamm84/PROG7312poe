@@ -19,15 +19,23 @@ namespace PROGPOEDH.Controllers
         [HttpPost]
         public IActionResult SubmitReport(FormModel model)
         {
-            if (ModelState.IsValid)
+
+            //model.Picture = System.IO.File.ReadAllBytes(model.Picture);
+            using (var ms = new MemoryStream())
             {
-                // add the form data into the linked list
-                reports.AddReport(model.Category, model.Description, model.Location, model.Document, model.Picture, model.viewPicture);
+                model.PictureFile.CopyTo(ms);
+                model.Picture = ms.ToArray();
+            }
+            //convert model docuemnt to byte array 
+            // remove 
+
+
+            // add the form data into the linked list
+            reports.AddReport(model.Category, model.Description, model.Location, model.Document, model.Picture, model.viewPicture, model.PictureFile);
 
                 // Redirect to show all reports
                 return RedirectToAction("AllReports");
-            }
-            return View("Error state isnt valid ", model); // if validation fails, redisplay form
+           
         }
 
         [HttpGet]

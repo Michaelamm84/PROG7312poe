@@ -8,7 +8,8 @@
         public string Description { get; set; }
         public byte[] Document {  get; set; }
         public byte[] Picture { get; set; }
-
         public string viewPicture {  get; set; }
+
+        public IFormFile PictureFile { get; set; }
     }
 }
