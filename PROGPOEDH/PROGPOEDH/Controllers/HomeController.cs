@@ -47,8 +47,7 @@ namespace PROGPOEDH.Controllers
             var list = FormController.reports.GetAllReports();
 
             return View("Views/Home/ShowReports.cshtml", list);
-            
-
+                
         }
 
 

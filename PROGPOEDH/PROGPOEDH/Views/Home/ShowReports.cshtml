@@ -8,6 +8,7 @@
             <th>Location</th>
             <th>Name</th>
             <th>Description</th>
+            <th>Picture</th>
         </tr>
     </thead>
     <tbody>
@@ -15,8 +16,25 @@
         {
             <tr>
                 <td>@report.Location</td>
-                <td>@report.Name</td>
+                <td>@report.Category</td>
                 <td>@report.Description</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(report.viewPicture))
+                    {
+                        if (report.viewPicture.StartsWith("data:image"))
+                        {
+                            <img src="@report.viewPicture" alt="Report Image" width="200" />
+                        }
+                        else if (report.viewPicture.StartsWith("data:application/pdf"))
+                        {
+                            <embed src="@report.viewPicture" type="application/pdf" width="200" height="200" />
+                        }
+                    }
+                    else
+                    {
+                        <span>No file uploaded</span>
+                    }
+                </td>
             </tr>
         }
     </tbody>

@@ -1,6 +1,9 @@
-﻿using PROGPOEDH.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+using PROGPOEDH.Controllers;
 using PROGPOEDH.Models;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
 
 namespace PROGPOEDH.Services
 {
@@ -8,22 +11,29 @@ namespace PROGPOEDH.Services
     //creating the structure of the node within my linked list
     public class ReportNode
     {
-
-        public string Name { get; set; }
+       // public int id { get; set; }
+        public string Category { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
 
-        public byte[] Data { get; set; }
+        public byte[] Docuemnt { get; set; }
+        public byte[] Picture { get; set; }
+
+        public string viewPicture { get; set; }
 
         //the next feature refernces the next node within the linked list allowing them to be "linked"
         public ReportNode Next { get; set; }
 
         //creating a constructor for the node 
-        public ReportNode(string Name, string Description, string Location)
+        public ReportNode(string Category, string Description, string Location, byte[] Docuemnt, byte[] Picture, string viewPicture )
         {
-            this.Name = Name;
+            //this.id = id++;
+            this.Category = Category;
             this.Description = Description;
             this.Location = Location;
+            this.Docuemnt = Docuemnt;
+            this.Picture = Picture;
+            this.viewPicture = viewPicture;
 
 
             //when initiating a new instance of the node the next node will always be null 
@@ -32,7 +42,7 @@ namespace PROGPOEDH.Services
         //A method to print out the Node 
         public override string ToString()
         {
-            return $"[{Location}] {Name}: {Description}";
+            return $"[{Location}] {Category}: {Description} : {Docuemnt}: {viewPicture}"; // added last two recently 
         }
     }
 
@@ -50,9 +60,9 @@ namespace PROGPOEDH.Services
             Head = null;
             Tail = null;
         }
-        public void AddReport(string Name, string Description, string Location)
+        public void AddReport(string Name, string Description, string Location, byte[] Document, byte[] Picture, string viewPicture)
         {
-            ReportNode newNode = new ReportNode(Name, Description, Location);
+            ReportNode newNode = new ReportNode( Name, Description, Location, Document, Picture, viewPicture);
 
 
             if (Head == null) // first bvalue in linked list 
@@ -71,27 +81,69 @@ namespace PROGPOEDH.Services
         {
             List<FormModel> list = new List<FormModel>();
             ReportNode current = Head;
+
             while (current != null)
             {
+                string pictureBase64 = null;
+                if (current.Picture != null)
+                {
+                    pictureBase64 = $"data:image/jpeg;base64,{Convert.ToBase64String(current.Picture)}";
+                }
+
+                string documentBase64 = null;
+                if (current.Docuemnt != null)
+                {
+                    documentBase64 = $"data:application/pdf;base64,{Convert.ToBase64String(current.Docuemnt)}";
+                }
+
                 list.Add(new FormModel
                 {
                     Location = current.Location,
-                    Name = current.Name,
-                    Description = current.Description
+                    Category = current.Category,
+                    Description = current.Description,
+                    Picture = current.Picture, // keep the raw bytes if needed
+                    viewPicture = pictureBase64 ?? documentBase64 // prefer image, fallback to pdf
+                });
+
+                current = current.Next;
+            }
+
+            return list;
+        }
+
+
+        /*public List<FormModel> GetAllReports()
+        {
+            List<FormModel> list = new List<FormModel>();
+            ReportNode current = Head;
+
+            while (current != null)
+            {
+               
+                list.Add(new FormModel
+                {
+                    Location = current.Location,
+                    Category = current.Category,
+                    Description = current.Description,
+                    Picture = current.Picture,
+
+                    viewPicture = current.Picture != null
+                ? $"data:image/jpeg;base64,{Convert.ToBase64String(current.Picture)}"
+                : null
                 });
                 current = current.Next;
             }
             return list;
 
-        }
+        }*/
 
-        public void DeleteNode(string Name)
+        public void DeleteNode(string Description)
         {
             if (FormController.reports.Head == null)
                 return;
 
             // Special case: deleting the head node
-            if (FormController.reports.Head.Name == Name)
+            if (FormController.reports.Head.Description == Description)
             {
                 FormController.reports.Head = FormController.reports.Head.Next;
                 return;
@@ -101,7 +153,7 @@ namespace PROGPOEDH.Services
             var current = FormController.reports.Head;
             while (current.Next != null)
             {
-                if (current.Next.Name == Name)
+                if (current.Next.Description == Description)
                 {
                     
                     current.Next = current.Next.Next;
@@ -112,14 +164,32 @@ namespace PROGPOEDH.Services
                     current.Next = current;
                 }
             }
+
+
         }
+        //public ActionResult RenderImage(byte[] picture) => base.File(picture, "image/png");
+
 
         public void PopulateList()
         {
-            FormController.reports.AddReport("michael", "found a pothole", "cape town");
-            FormController.reports.AddReport("Dean", "found a burst pipe", "Joburg");
+            string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "POTHOLE.jpg");
+            byte[] potHolePicture = System.IO.File.ReadAllBytes(imagePath);
+
+            string pdfPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "ivoda.pdf");
+            byte[] potHolePDF = System.IO.File.ReadAllBytes(pdfPath);
+
+            if (potHolePicture != null || potHolePDF != null)
+            {
+                Console.WriteLine("empty file error");
+            }
+
+
+            FormController.reports.AddReport("michael", "found a pothole", "cape town", potHolePDF, potHolePicture, "this is string "); 
+
+
+         /*   FormController.reports.AddReport("Dean", "found a burst pipe", "Joburg");
             FormController.reports.AddReport("Lia", "found a car", "Durban");
-            FormController.reports.AddReport("kevin", "found a bump", "stellenbosch");
+            FormController.reports.AddReport("kevin", "found a bump", "stellenbosch");*/
         }
 
 

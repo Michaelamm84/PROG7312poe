@@ -2,21 +2,32 @@
 
 <h2>Create Report</h2>
 
-<form asp-action="SubmitReport" asp-controller= "Form" method="post">
+<form asp-action="SubmitReport" asp-controller="Form" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label asp-for="Location"></label>
         <input asp-for="Location" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
+        <label asp-for="Category"></label>
+        <input asp-for="Category" class="form-control" />
     </div>
 
     <div class="form-group">
         <label asp-for="Description"></label>
         <textarea asp-for="Description" class="form-control"></textarea>
     </div>
+
+    <div class="form-group">
+        <label asp-for="Picture"></label>
+        <input asp-for="Picture" type="file" class="form-control" />
+    </div>
+
+      <div class="form-group">
+        <label asp-for="Document"></label>
+        <input asp-for="Document" class="form-control" />
+    </div>
+
 
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>

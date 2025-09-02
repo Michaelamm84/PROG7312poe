@@ -22,7 +22,7 @@ namespace PROGPOEDH.Controllers
             if (ModelState.IsValid)
             {
                 // add the form data into the linked list
-                reports.AddReport(model.Name, model.Description, model.Location);
+                reports.AddReport(model.Category, model.Description, model.Location, model.Document, model.Picture, model.viewPicture);
 
                 // Redirect to show all reports
                 return RedirectToAction("AllReports");
@@ -34,6 +34,7 @@ namespace PROGPOEDH.Controllers
         public IActionResult AllReports()
         {
             var allReports = reports.GetAllReports();
+            
             return View("Views/Home/ShowReports.cshtml", allReports); // pass list of FormModel to view
         }
 
@@ -47,6 +48,13 @@ namespace PROGPOEDH.Controllers
         }
         // static so it persists between requests
 
+        public IActionResult RenderImage(byte[] Picture)
+        {
 
+            
+           
+
+            return File(Picture, "image/jpeg");
+        }
     }
 }
