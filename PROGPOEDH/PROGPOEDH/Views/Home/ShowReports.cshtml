@@ -35,6 +35,22 @@
                         <span>No file uploaded</span>
                     }
                 </td>
+                @if (!string.IsNullOrEmpty(report.viewDocument))
+                {
+                     if (report.viewDocument.StartsWith("data:application/pdf"))
+                    {
+                        <embed src="@report.viewDocument" type="application/pdf" width="200" height="200" />
+                    }
+                }
+                else
+                {
+                    <span>No file uploaded</span>
+                }
+
+                <td>
+
+
+                </td>
             </tr>
         }
     </tbody>

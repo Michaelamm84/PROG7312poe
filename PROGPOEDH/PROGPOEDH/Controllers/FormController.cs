@@ -26,12 +26,19 @@ namespace PROGPOEDH.Controllers
                 model.PictureFile.CopyTo(ms);
                 model.Picture = ms.ToArray();
             }
+
+            using (var ms = new MemoryStream())
+            { model.DocumentFile.CopyTo(ms);
+            model.Document = ms.ToArray();
+            }
             //convert model docuemnt to byte array 
+            //convert to base64string 
+            //create viewmodel 
             // remove 
 
 
             // add the form data into the linked list
-            reports.AddReport(model.Category, model.Description, model.Location, model.Document, model.Picture, model.viewPicture, model.PictureFile);
+            reports.AddReport(model.Category, model.Description, model.Location, model.Document, model.Picture, model.viewPicture, model.PictureFile, model.DocumentFile, model.viewDocument);
 
                 // Redirect to show all reports
                 return RedirectToAction("AllReports");
