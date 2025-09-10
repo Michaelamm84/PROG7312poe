@@ -1,16 +1,26 @@
 ﻿@model PROGPOEDH.Models.FormModel
 
-<h2>Delete Report</h2>
-
-<form asp-action="DeleteReport" asp-controller="Form" method="post">
-    
-
-    <div class="form-group">
-        <label asp-for="Description"></label>
-        <input asp-for="Description" class="form-control" />
+<div class="glass glass-sm mt-3">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h4 class="mb-1">Delete report</h4>
+            <p class="small mb-0" style="color: rgba(255,255,255,0.78);">
+                Enter the report description (or its identifying text) below to remove a previously submitted report.
+                Deletion is permanent — make sure you have the correct report before submitting.
+            </p>
+        </div>
+        <div class="text-end">
+            <small class="text-muted">Writes to DB</small>
+        </div>
     </div>
 
-   
+    <form asp-action="DeleteReport" asp-controller="Form" method="post" class="mt-3">
+        <div class="form-group mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <input asp-for="Description" class="form-control" placeholder="Enter report description or ID" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+        <button type="submit" class="btn btn-danger" aria-label="Delete report">Delete</button>
+        <small class="d-block text-muted mt-2">Tip: ensure the description matches exactly (case-sensitive depending on backend).</small>
+    </form>
+</div>

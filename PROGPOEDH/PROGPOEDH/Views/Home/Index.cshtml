@@ -1,113 +1,101 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
+    Layout = "_Layout";
 }
 
-@{
-    ViewBag.Title = "Home";
-}
+<style>
+    /* Full-page background — replace the URL or use a gradient */
+    .page-bg {
+        min-height: 100vh;
+        background-image: url('/images/cape-town.jpg'); /* <- replace with your image path */
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 1rem;
+    }
 
+    /* Glass / blurred rounded box */
+    .glass {
+        width: 100%;
+        max-width: 1000px;
+        background: rgba(255,255,255,0.08); /* light tint */
+        border-radius: 1rem;
+        padding: 2.2rem;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color: #ffffff;
+    }
 
-<div class="container my-4" style="font-family: Arial, sans-serif;">
+    /* Slightly stronger inner panel for text readability on small screens */
+    .glass .lead {
+        color: rgba(255,255,255,0.9);
+    }
 
-    <!-- Welcome Banner -->
-    <div class="p-5 mb-4 rounded-3" style="background: linear-gradient(90deg, #007847, #FFD100, #E23D28, #002395); color: white;">
-        <div class="container-fluid py-3">
-            <h1 class="display-5 fw-bold">Welcome to Our Community Portal</h1>
-            <p class="col-md-8 fs-5">Stay connected, informed, and engaged with local updates and services.</p>
+    /* Make disabled buttons visually subdued but still clickable for tooltip */
+    .btn-not-implemented {
+        pointer-events: none; /* prevents click */
+        opacity: 0.55;
+        filter: grayscale(0.1);
+    }
+
+    /* Layout helpers */
+    .glass .actions {
+        margin-top: 1.25rem;
+    }
+
+   
+</style>
+
+<div class="page-bg">
+    <div class="glass">
+        <!-- Header -->
+        <div class="text-center mb-3">
+            <h1 class="fw-bold mb-1">@ViewData["Title"]</h1>
+            <p class="mb-0 small text-uppercase" style="letter-spacing:.12em; color: rgba(255,255,255,0.7);">Album example</p>
         </div>
-    </div>
 
-    <!-- Main Options -->
-    <div class="row text-center mb-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm" style="border-top: 5px solid #007847;">
-                <div class="card-body">
-                    <h4 class="card-title">Report Issues</h4>
-                    <p class="card-text">Let us know about any problems in your area.</p>
-                    <a href="@Url.Action("reportIssue", "Home")" class="btn btn-success">
-                        Report Issue
-                    </a>
-                    <button class="btn" style="background-color: #FFD100; color: black; font-weight: bold;">Coming Soon</button>
+        <!-- Short description about the application -->
+        <div class="px-1">
+            <p class="lead">
+                This application is a lightweight album/collection manager that demonstrates item listing,
+                basic item actions, and a simple issue-reporting flow. The panel you see here explains the app's
+                purpose and status.
+            </p>
+
+            <ul>
+                <li>Manage items (view, edit) — UI shown but not implemented in this prototype.</li>
+                <li>Report issues — <strong>active</strong> (use this to send feedback or file bugs).</li>
+                <li>Additional features listed in the UI are placeholders and will be implemented later.</li>
+            </ul> </div>
+        <div class="glass glass-sm mt-3">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h4 class="mb-1">Populate app</h4>
+                    <p class="small mb-0" style="color: rgba(255,255,255,0.78);">
+                        Seed demo/sample data into the application. The server-side `Populate` action will handle the insertion.
+                    </p>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">Writes to DB</small>
                 </div>
             </div>
+
+            <form asp-controller="Home" asp-action="Populate" method="post" class="mt-3 m-0 p-0">
+               
+                <button type="submit" class="btn btn-success" id="populateBtn" aria-label="Populate application with demo data">
+                    <!-- optional icon if you include Bootstrap Icons -->
+                    <span class="me-1" aria-hidden="true">⬇️</span>
+                    Populate app
+                </button>
+            </form>
+
+            <small class="text-muted d-block mt-2">Tip: this calls `ItemsController.Populate` (POST).</small>
         </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm" style="border-top: 5px solid #007847;">
-                <div class="card-body">
-                    <h4 class="card-title">View Issues</h4>
-                    <p class="card-text">Click is view all reports.</p>
-                    <a href="@Url.Action("ShowReports", "Home")" class="btn btn-success">
-                        ShowReports
-                    </a>
-                    <button class="btn" style="background-color: #FFD100; color: black; font-weight: bold;">Coming Soon</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm" style="border-top: 5px solid #007847;">
-                <div class="card-body">
-                    <h4 class="card-title">Delete report</h4>
-                    <p class="card-text">Delete report.</p>
-                    <a href="@Url.Action("deleteView", "Home")" class="btn btn-success">
-                        ShowReports
-                    </a>
-                    <button class="btn" style="background-color: #FFD100; color: black; font-weight: bold;">Coming Soon</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm" style="border-top: 5px solid #007847;">
-                <div class="card-body">
-                    <h4 class="card-title">populate list</h4>
-                    <p class="card-text">populate list.</p>
-                    <a href="@Url.Action("Populate", "Home")" class="btn btn-success">
-                        populate list
-                    </a>
-                    <button class="btn" style="background-color: #FFD100; color: black; font-weight: bold;">Coming Soon</button>
-                </div>
-            </div>
-        </div>
-
-    <!-- News & Announcements -->
-    <h3 class="mb-3" style="color: #007847;">Latest Community News</h3>
-    <div class="list-group mb-4">
-        <a href="#" class="list-group-item list-group-item-action">
-            🌳 Tree Planting Day – Join us this Saturday at the park!
-        </a>
-        <a href="#" class="list-group-item list-group-item-action">
-            🚧 Roadworks Notice – Main Street closed from Aug 20 to Sep 5.
-        </a>
-        <a href="#" class="list-group-item list-group-item-action">
-            🏆 Local Soccer Team Wins Regional Championship!
-        </a>
-    </div>
-
-    <!-- Quick Links -->
-    <h3 class="mb-3" style="color: #E23D28;">Quick Links</h3>
-    <div class="d-flex flex-wrap gap-2 mb-4">
-        <a href="#" class="btn btn-outline-success">Municipal Contacts</a>
-        <a href="#" class="btn btn-outline-warning">Emergency Numbers</a>
-        <a href="#" class="btn btn-outline-primary">Local Businesses</a>
-        <a href="#" class="btn btn-outline-danger">Volunteer Opportunities</a>
-    </div>
-
-    <!-- Community Tips -->
-    <div class="p-4 rounded shadow-sm" style="background-color: #f5f5f5;">
-        <h4 style="color: #002395;">Community Tip of the Week</h4>
-        <p>Remember to separate your recycling into paper, plastic, and glass. Together, we can make a greener South Africa!</p>
-    </div>
-
-    <!-- Footer with SA Flag Colors -->
-    <div class="d-flex mt-5" style="height: 20px;">
-        <div style="flex: 1; background-color: #007847;"></div>
-        <div style="flex: 1; background-color: #FFD100;"></div>
-        <div style="flex: 1; background-color: black;"></div>
-        <div style="flex: 1; background-color: #E23D28;"></div>
-        <div style="flex: 1; background-color: #002395;"></div>
-        <div style="flex: 1; background-color: white;"></div>
-    </div>
-</div>
-
+            <p class="small mb-0" style="color: rgba(255,255,255,0.75);">
+                Note: Only the <em>Report issue</em> action is wired to the backend at the moment. Other actions are visible

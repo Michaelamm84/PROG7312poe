@@ -13,21 +13,14 @@ namespace PROGPOEDH.Services
     //creating the structure of the node within my linked list
     public class ReportNode
     {
-
-        //make of type form model 
-      
         public string Category { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
-
         public byte[] Document { get; set; }
         public byte[] Picture { get; set; }
         public string viewPicture { get; set; }
-
         public string viewDocument { get; set; }
-
         public IFormFile PictureFile { get; set; }
-
         public IFormFile DocuemntFile { get; set; }
        
 
@@ -48,7 +41,6 @@ namespace PROGPOEDH.Services
             this.PictureFile = PictureFile;
             this.viewDocument = viewDocument;
             this.DocuemntFile = DocuemntFile;
-
 
             //when initiating a new instance of the node the next node will always be null 
             Next = null;
@@ -92,7 +84,7 @@ namespace PROGPOEDH.Services
                 Tail = newNode;// makes new node the tail 
             }
         }
-
+        // A method that creates a list to display 
         public List<FormModel> GetAllReports()
         {
             List<FormModel> list = new List<FormModel>();
@@ -100,8 +92,6 @@ namespace PROGPOEDH.Services
 
             while (current != null)
             {
-              
-
                 list.Add(new FormModel
                 {
                     Location = current.Location,
@@ -113,17 +103,11 @@ namespace PROGPOEDH.Services
                     PictureFile = current.PictureFile,
                     DocumentFile = current.DocuemntFile,
                     viewDocument = $"data:application/pdf;base64,{Convert.ToBase64String(current.Document)}"
-
                 });
-
                 current = current.Next;
             }
-
             return list;
         }
-
-
-      
 
         public void DeleteNode(string Description)
         {
@@ -137,23 +121,22 @@ namespace PROGPOEDH.Services
                 return;
             }
 
-
             var current = FormController.reports.Head;
+            //iterates through linked list until descriptions match 
             while (current.Next != null)
             {
+                // links the the current node to the node following of the node with descriptions that match 
+                //This cuts out the desire node 
                 if (current.Next.Description == Description)
                 {
-                    
                     current.Next = current.Next.Next;
                     return;
                 }
                 else
                 {
-                    current.Next = current;
+                    current = current.Next;
                 }
             }
-
-
         }
        
 
@@ -166,25 +149,9 @@ namespace PROGPOEDH.Services
             string pdfPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "ivoda.pdf");
             byte[] potHolePDF = System.IO.File.ReadAllBytes(pdfPath);
 
-            if (potHolePicture != null || potHolePDF != null)
-            {
-                Console.WriteLine("empty file error");
-            }
-           
+            FormController.reports.AddReport("Cape Town", "found a pothole", "cape town", potHolePDF, potHolePicture, "this is string", null,null, "this is docuement"); 
 
-            FormController.reports.AddReport("michael", "found a pothole", "cape town", potHolePDF, potHolePicture, "this is string", null,null, "this is docuement"); 
-
-
-         
         }
-
-       /* public ActionResult GetPdf(string filename)
-        {
-            return File.);
-        }*/
-
-
-
     }
 }
 
