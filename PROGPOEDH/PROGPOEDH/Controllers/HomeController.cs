@@ -25,7 +25,8 @@ namespace PROGPOEDH.Controllers
             return View();
         }
 
-        public IActionResult reportIssue() {
+        public IActionResult reportIssue()
+        {
 
             return View("Views/Home/ReportIssueView.cshtml");
         }
@@ -34,8 +35,8 @@ namespace PROGPOEDH.Controllers
         {
             FormController.reports.PopulateList();
             var allreports = FormController.reports.GetAllReports();
-            return View("Views/Home/ShowReports.cshtml" ,allreports);
-            
+            return View("Views/Home/ShowReports.cshtml", allreports);
+
         }
         //returns deleted view 
         public IActionResult deleteView()
@@ -48,5 +49,6 @@ namespace PROGPOEDH.Controllers
 
             return View("Views/Home/ShowReports.cshtml", list);
 
+        }
     }
 }
