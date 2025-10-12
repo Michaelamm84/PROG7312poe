@@ -1,0 +1,121 @@
+﻿@model PROGPOEDH.Models.FormModel
+
+<h2>Create Report</h2>
+
+<form asp-action="SubmitReport" asp-controller="Form" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="Location"></label>
+        <input asp-for="Location" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Category"></label>
+        <input asp-for="Category" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label class=" form-label" asp-for="PictureFile"></label>
+        <input asp-for="PictureFile" type="file" class="form-control" />
+    </div>
+
+      <div class="form-group">
+        <label asp-for="DocumentFile"></label>
+        <input asp-for="DocumentFile" type ="file" class="form-control" />
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+
+
+
+
+
+
+@* @{
+    ViewBag.Title = "Report Issue";
+}
+
+<div class="container my-4" style="font-family: Arial, sans-serif;">
+
+    <!-- Page Title -->
+    <div class="p-4 mb-4 rounded-3" style="background: linear-gradient(90deg, #007847, #FFD100, #E23D28, #002395); color: white;">
+        <h1 class="fw-bold">Report an Issue</h1>
+        <p>Help us improve our community by reporting problems in your area.</p>
+    </div>
+
+    <body>
+        @using (Html.BeginForm("Submit", "form", FormMethod.Post))
+        {
+            <div>
+                <label>Name:</label>
+                <input type="text" name="Name" />
+            </div>
+            <div>
+                <label>Location:</label>
+                <input type="text" name="Location" />
+            </div>
+            <div>
+                <label>Category:</label>
+                <input type="text" name="catagory" />
+            </div>
+            <div>
+                <label>Picture:</label>
+                <input type="text" name="picture" />
+            </div>
+            <input type="submit" value="Submit" />
+        }
+
+        <div>
+            @ViewBag.Message
+        </div>
+    </body>
+
+    <!-- Footer -->
+    <div class="d-flex mt-5" style="height: 20px;">
+        <div style="flex: 1; background-color: #007847;"></div>
+        <div style="flex: 1; background-color: #FFD100;"></div>
+        <div style="flex: 1; background-color: black;"></div>
+        <div style="flex: 1; background-color: #E23D28;"></div>
+        <div style="flex: 1; background-color: #002395;"></div>
+        <div style="flex: 1; background-color: white;"></div>
+    </div>
+</div>
+
+<!-- Simple JS for progress simulation -->
+<script>
+    const inputs = document.querySelectorAll('#location, #category, #description, #media');
+    const progressBar = document.getElementById('progressBar');
+    const encouragement = document.getElementById('encouragement');
+
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            let filled = 0;
+            inputs.forEach(i => {
+                if (i.value) filled++;
+            });
+            const percent = Math.round((filled / inputs.length) * 100);
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = percent + '%';
+
+            if (percent < 50) {
+                encouragement.textContent = "Great start! Keep going 🚀";
+            } else if (percent < 100) {
+                encouragement.textContent = "Almost there! 🌟";
+            } else {
+                encouragement.textContent = "Ready to submit! ✅";
+            }
+        });
+    });
+</script>
+ *@

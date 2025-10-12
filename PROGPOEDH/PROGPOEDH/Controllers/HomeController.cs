@@ -29,7 +29,7 @@ namespace PROGPOEDH.Controllers
 
             return View("Views/Home/ReportIssueView.cshtml");
         }
-
+        //Populates application 
         public IActionResult Populate()
         {
             FormController.reports.PopulateList();
@@ -37,7 +37,7 @@ namespace PROGPOEDH.Controllers
             return View("Views/Home/ShowReports.cshtml" ,allreports);
             
         }
-
+        //returns deleted view 
         public IActionResult deleteView()
         {
             return View("Views/Home/DeleteNode.cshtml");
@@ -47,14 +47,7 @@ namespace PROGPOEDH.Controllers
             var list = FormController.reports.GetAllReports();
 
             return View("Views/Home/ShowReports.cshtml", list);
-                
-        }
-
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+              
         }
     }
 }

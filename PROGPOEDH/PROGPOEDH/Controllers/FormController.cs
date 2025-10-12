@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PROGPOEDH.Models;
 using PROGPOEDH.Services;
+using System.Reflection.Metadata;
 
 namespace PROGPOEDH.Controllers
 {
@@ -20,23 +22,17 @@ namespace PROGPOEDH.Controllers
         public IActionResult SubmitReport(FormModel model)
         {
 
-            //model.Picture = System.IO.File.ReadAllBytes(model.Picture);
+            //coverts IFrom file to byte array so it can be turned into a string 
             using (var ms = new MemoryStream())
             {
                 model.PictureFile.CopyTo(ms);
                 model.Picture = ms.ToArray();
             }
-
+            //coverts IFrom file to byte array so it can be turned into a string 
             using (var ms = new MemoryStream())
             { model.DocumentFile.CopyTo(ms);
             model.Document = ms.ToArray();
             }
-            //convert model docuemnt to byte array 
-            //convert to base64string 
-            //create viewmodel 
-            // remove 
-
-
             // add the form data into the linked list
             reports.AddReport(model.Category, model.Description, model.Location, model.Document, model.Picture, model.viewPicture, model.PictureFile, model.DocumentFile, model.viewDocument);
 
@@ -45,31 +41,23 @@ namespace PROGPOEDH.Controllers
            
         }
 
+        //A method that displays all stored reports 
         [HttpGet]
         public IActionResult AllReports()
         {
+            //calls the method to show all reports 
             var allReports = reports.GetAllReports();
-            
-            return View("Views/Home/ShowReports.cshtml", allReports); // pass list of FormModel to view
+
+            // pass list of FormModel to view
+            return View("Views/Home/ShowReports.cshtml", allReports); 
         }
 
+        //"deleteReport" Calls a method that deletes the report with a matching description 
         [HttpPost]
-        public IActionResult DeleteReport(string Name)
+        public IActionResult DeleteReport(string Description)
         {
-            reports.DeleteNode(Name);
-
+            reports.DeleteNode(Description);
             return RedirectToAction("AllReports");
-
-        }
-        // static so it persists between requests
-
-        public IActionResult RenderImage(byte[] Picture)
-        {
-
-            
-           
-
-            return File(Picture, "image/jpeg");
         }
     }
 }

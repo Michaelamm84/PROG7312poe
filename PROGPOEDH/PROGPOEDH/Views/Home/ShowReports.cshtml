@@ -1,57 +1,45 @@
 ﻿@model IEnumerable<PROGPOEDH.Models.FormModel>
 
-<h2>All Reports</h2>
+<h2 class="mb-4">All Reports</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Location</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Picture</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var report in Model)
-        {
-            <tr>
-                <td>@report.Location</td>
-                <td>@report.Category</td>
-                <td>@report.Description</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(report.viewPicture))
-                    {
-                        if (report.viewPicture.StartsWith("data:image"))
+<div class="row">
+    @foreach (var report in Model)
+    {
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">@report.Category</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@report.Location</h6>
+                    <p class="card-text">@report.Description</p>
+
+                    <div class="d-flex gap-3 mb-3">
+                        @if (!string.IsNullOrEmpty(report.viewPicture) && report.viewPicture.StartsWith("data:image"))
                         {
-                            <img src="@report.viewPicture" alt="Report Image" width="200" />
+                            <img src="@report.viewPicture" alt="Report Image" class="img-fluid rounded border" style="max-width:200px; max-height:200px;" />
                         }
-                        else if (report.viewPicture.StartsWith("data:application/pdf"))
+                        else
                         {
-                            <embed src="@report.viewPicture" type="application/pdf" width="200" height="200" />
+                            <span class="text-muted">No image uploaded</span>
                         }
-                    }
-                    else
+
+                        @if (!string.IsNullOrEmpty(report.viewDocument) && report.viewDocument.StartsWith("data:application/pdf"))
+                        {
+                            <embed src="@report.viewDocument" type="application/pdf" width="200" height="200" class="border rounded" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">No PDF uploaded</span>
+                        }
+                    </div>
+
+                  @*   @if (!string.IsNullOrEmpty(report.viewDocument))
                     {
-                        <span>No file uploaded</span>
-                    }
-                </td>
-                @if (!string.IsNullOrEmpty(report.viewDocument))
-                {
-                     if (report.viewDocument.StartsWith("data:application/pdf"))
-                    {
-                        <embed src="@report.viewDocument" type="application/pdf" width="200" height="200" />
-                    }
-                }
-                else
-                {
-                    <span>No file uploaded</span>
-                }
-
-                <td>
-
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                        <a href="@Url.Action("DownloadPdf", "Form", new { id = report.Id })" class="btn btn-sm btn-outline-primary">
+                            Download PDF
+                        </a>
+                    } *@
+                </div>
+            </div>
+        </div>
+    }
+</div>
