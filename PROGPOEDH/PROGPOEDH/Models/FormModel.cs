@@ -13,5 +13,7 @@
         public IFormFile PictureFile { get; set; }
         public IFormFile DocumentFile { get; set; }
         public string viewDocument { get; set; }
+
+
     }
 }

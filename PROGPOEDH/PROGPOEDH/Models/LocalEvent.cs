@@ -8,5 +8,13 @@
         public DateTime Date { get; set; }
         public string Description { get; set; }
         public int Priority { get; set; }  // for priority queue
+
+        public override string ToString()
+        {
+            return $"[Event ID: {Id}] {Title} ({Category})\n" +
+                   $"Date: {Date:yyyy-MM-dd HH:mm}\n" +
+                   $"Priority: {Priority}\n" +
+                   $"Description: {Description}";
+        }
     }
 }

@@ -1,0 +1,50 @@
+﻿@model List<PROGPOEDH.Models.LocalEvent>
+@{
+    ViewData["Title"] = "Search Events by Title";
+    var query = ViewBag.Query as string;
+}
+
+<h2>🔎 Search Events by Title</h2>
+
+<form asp-controller="Events" asp-action="SearchByTitle" method="get" style="margin-bottom:20px;">
+    <input type="text" name="q" value="@query" placeholder="Enter event title or keywords" style="width:300px; padding:6px;" />
+    <button type="submit" style="padding:6px 12px;">Search</button>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(query))
+{
+    <h3>Results for: "<em>@query</em>"</h3>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <table style="border-collapse:collapse; width:80%; margin-top:10px;">
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Title</th>
+                    <th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Category</th>
+                    <th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Date</th>
+                    <th style="text-align:left; padding:6px; border-bottom:1px solid #ddd;">Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model)
+                {
+                    <tr>
+                        <td style="padding:6px; border-bottom:1px solid #eee;">@e.Title</td>
+                        <td style="padding:6px; border-bottom:1px solid #eee;">@e.Category</td>
+                        <td style="padding:6px; border-bottom:1px solid #eee;">@e.Date.ToShortDateString()</td>
+                        <td style="padding:6px; border-bottom:1px solid #eee;">@e.Priority</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No events found that match "<strong>@query</strong>".</p>
+    }
+}
+else
+{
+    <p>Type part of an event title above and press <em>Search</em>.</p>
+}

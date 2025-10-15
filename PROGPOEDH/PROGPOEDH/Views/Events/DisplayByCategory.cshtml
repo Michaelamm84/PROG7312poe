@@ -1,0 +1,13 @@
+﻿@model Dictionary<string, List<LocalEvent>>
+<h2>Events grouped by category</h2>
+
+@foreach (var kv in Model)
+{
+    <h3>@kv.Key (@kv.Value.Count)</h3>
+    <ul>
+        @foreach (var e in kv.Value)
+        {
+            <li>@e.Title — @e.Date.ToShortDateString()</li>
+        }
+    </ul>
+}

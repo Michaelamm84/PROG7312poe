@@ -1,5 +1,12 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Events - Main";
 }
+<h2>Events - choose a view</h2>
+
+<div style="display:flex; gap:10px;">
+    <form asp-action="DisplayAllByCategory" method="get"><button type="submit">View All (by Category)</button></form>
+    <form asp-action="DisplayByStack" method="get"><button type="submit">View (Stack) — newest first</button></form>
+    <form asp-action="DisplayByQueue" method="get"><button type="submit">View (Queue) — newest first (queue option)</button></form>
+    <form asp-action="SearchCatagory" method="get"><button type="submit">Search by Category</button></form>
+    <form asp-action="SearchDate" method="get"><button type="submit">Search by Date</button></form>
+</div>

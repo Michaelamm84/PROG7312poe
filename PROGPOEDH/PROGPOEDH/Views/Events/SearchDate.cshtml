@@ -1,0 +1,34 @@
+﻿@model List<LocalEvent>
+@{
+    var selected = ViewBag.SelectedDate as string;
+}
+
+<h2>Search by Date</h2>
+
+<form asp-action="SearchDate" method="get">
+    <select name="date">
+        <option value="">-- choose date --</option>
+        @foreach (var d in ViewBag.AllDates as SortedSet<DateTime>)
+        {
+            <option value="@d.ToString("yyyy-MM-dd")">@d.ToShortDateString()</option>
+        }
+    </select>
+    <button type="submit">Search</button>
+</form>
+
+@if (selected != null)
+{
+    <h3>Results for: @selected</h3>
+    @if (Model != null && Model.Count > 0)
+    {
+        <ul>@foreach (var e in Model) {
+        <li>@e.Title — @e.Category</li>
+    }
+    </ul>
+}
+else
+{
+
+    <p>@ViewBag.Message</p>
+}
+}

@@ -35,6 +35,12 @@ namespace PROGPOEDH.Controllers
             return View("Views/Events/Search.cshtml");
         }
 
+        public IActionResult AddEvent()
+        {
+            return View("Views/Events/AddEvent.cshtml");
+        }
+
+
         public IActionResult DisplayEvents()
         {
             return View("Views/Events/DisplayIndex.cshtml");
