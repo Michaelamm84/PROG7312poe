@@ -78,7 +78,8 @@ namespace PROGPOEDH.Services
         public SortedSet<DateTime> GetUniqueDates(List<LocalEvent> events) =>
             new SortedSet<DateTime>(events.Select(e => e.Date.Date));
 
-        // =================== Search Methods ===================
+
+      //=================== Search Methods ===================//
         public List<LocalEvent> SearchEventsByTitle(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
@@ -106,10 +107,14 @@ namespace PROGPOEDH.Services
             titleSearchCounts[title] = titleSearchCounts.GetValueOrDefault(title) + 1;
         }
 
-        // =================== Suggestion Algorithms ===================/// <summary>
-        /// Generates personalized event suggestions based on search history.
+        
+
+        // =================== Suggestion Algorithms ===================/// 
+        
+
+        // Generates personalized event suggestions based on search history.
         /// Algorithm:
-        /// 1. Identify top 3 most-searched categories and dates
+        /// 1. Identify top 3 most-searched categories and dates by use of a point system 
         /// 2. Filter events matching these patterns
         /// 3. Return up to maxSuggestions distinct results
         /// 4. Fallback to random selection if no search history
@@ -119,7 +124,7 @@ namespace PROGPOEDH.Services
         {
             var allEvents = eventsByCategory.Values.SelectMany(x => x).ToList();
 
-            // Rank by what the user searches most often
+            // Rank by what the user searches most often (categories, dates, and now titles)
             var topCategories = categorySearchCounts
                 .OrderByDescending(kv => kv.Value)
                 .Take(3)
@@ -132,28 +137,40 @@ namespace PROGPOEDH.Services
                 .Select(kv => kv.Key)
                 .ToHashSet();
 
+            var topTitles = titleSearchCounts
+                .OrderByDescending(kv => kv.Value)
+                .Take(3)
+                .Select(kv => kv.Key)
+                .ToHashSet();
+
             var suggestions = allEvents
-                .Where(e => topCategories.Contains(e.Category) || topDates.Contains(e.Date.Date))
+                .Where(e => topCategories.Contains(e.Category) ||
+                           topDates.Contains(e.Date.Date) ||
+                           topTitles.Contains(e.Title))
                 .Distinct()
                 .Take(maxSuggestions)
                 .ToList();
 
-            // If no strong pattern yet, return random top 5
+            // Fallback to random top 5 if no search history
             if (suggestions.Count == 0)
-                suggestions = allEvents.Take(maxSuggestions).ToList();
+                suggestions = allEvents.OrderBy(e => Guid.NewGuid()).Take(maxSuggestions).ToList();
 
             return suggestions;
         }
-        // <summary>
+
+        /// <summary>
         /// Query-specific suggestions matching title or category patterns.
         /// Simple containment search across title and category fields.
         /// </summary>
         public List<LocalEvent> SuggestBasedOnTitleQuery(string query, int max = 5)
         {
+            if (string.IsNullOrWhiteSpace(query))
+                return new List<LocalEvent>();
+
             var all = eventsByCategory.Values.SelectMany(x => x).ToList();
             return all
-                .Where(e => e.Title.Contains(query, StringComparison.OrdinalIgnoreCase)
-                            || e.Category.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .Where(e => e.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                            e.Category.Contains(query, StringComparison.OrdinalIgnoreCase))
                 .Take(max)
                 .ToList();
         }

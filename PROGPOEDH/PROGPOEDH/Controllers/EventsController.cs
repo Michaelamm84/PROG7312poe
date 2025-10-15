@@ -208,6 +208,8 @@ new LocalEvent { Id = 20, Title = "STEM Education Fair", Category = "Education",
         /// Performs case-insensitive title search using LINQ filtering.
         /// Provides query-based suggestions and records search analytics.
         /// </summary>
+        /// 
+
         [HttpGet]
         public IActionResult SearchTitle(string q)
         {
@@ -217,14 +219,36 @@ new LocalEvent { Id = 20, Title = "STEM Education Fair", Category = "Education",
                 return View("Views/Events/SearchByTitle.cshtml", new List<LocalEvent>());
             }
 
+            // Record the title search for analytics
             _eventService.RecordTitleSearch(q);
+
+            // Perform the search and get results
             var results = _eventService.SearchEventsByTitle(q);
 
+            // Set query for display and get query-specific suggestions
             ViewBag.Query = q;
             ViewBag.Suggestions = _eventService.SuggestBasedOnTitleQuery(q, 5);
 
             return View("Views/Events/SearchByTitle.cshtml", results);
         }
+
+        /* [HttpGet]
+         public IActionResult SearchTitle(string q)
+         {
+             if (string.IsNullOrWhiteSpace(q))
+             {
+                 ViewBag.Suggestions = _eventService.SuggestEvents(5);
+                 return View("Views/Events/SearchByTitle.cshtml", new List<LocalEvent>());
+             }
+
+             _eventService.RecordTitleSearch(q);
+             var results = _eventService.SearchEventsByTitle(q);
+
+             ViewBag.Query = q;
+             ViewBag.Suggestions = _eventService.SuggestBasedOnTitleQuery(q, 5);
+
+             return View("Views/Events/SearchByTitle.cshtml", results);
+         }*/
     }
 }
 

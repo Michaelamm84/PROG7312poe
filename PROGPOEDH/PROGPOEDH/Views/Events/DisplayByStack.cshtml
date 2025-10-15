@@ -112,7 +112,7 @@
 
 <div class="page-bg">
     <div class="glass">
-        <h2>🧱 Events (Stack - Newest First)</h2>
+        <h2>🧱 Events (Stack - Furthest away events first)</h2>
 
         @if (Model != null && Model.Any())
         {
@@ -133,7 +133,7 @@
         }
 
         <div class="actions">
-            <form asp-controller="Events" asp-action="EventIndex" method="get">
+            <form asp-controller="Home" asp-action="EventIndex" method="get">
                 <button type="submit">⬅ Back to Main</button>
             </form>
         </div>
