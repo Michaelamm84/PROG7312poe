@@ -1,5 +1,41 @@
-﻿@model Dictionary<string, List<LocalEvent>>
-<h2>Events grouped by category</h2>
+﻿@model Dictionary<string, List<PROGPOEDH.Models.LocalEvent>>
+
+@{
+    ViewData["Title"] = "Events grouped by category";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #121212;
+        color: #f1f1f1;
+        padding: 20px;
+    }
+
+    h2, h3 {
+        color: #00bcd4;
+    }
+
+    ul {
+        list-style-type: none;
+        padding-left: 20px;
+    }
+
+    li {
+        margin: 6px 0;
+        padding: 8px;
+        background-color: #1e1e1e;
+        border-radius: 8px;
+        color: #fff;
+        transition: background 0.3s;
+    }
+
+        li:hover {
+            background-color: #333;
+        }
+</style>
+
+<h2>📚 Events grouped by category</h2>
 
 @foreach (var kv in Model)
 {
@@ -7,7 +43,7 @@
     <ul>
         @foreach (var e in kv.Value)
         {
-            <li>@e.Title — @e.Date.ToShortDateString()</li>
+            <li><b>@e.Title</b> — @e.Date.ToShortDateString()</li>
         }
     </ul>
 }

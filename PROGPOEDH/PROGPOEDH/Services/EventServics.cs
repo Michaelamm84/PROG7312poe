@@ -1,139 +1,161 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PROGPOEDH.Controllers;
-using PROGPOEDH.Models;
+﻿using PROGPOEDH.Models;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+/// <summary>
+/// Service layer for event management, data structure operations, search functionality, 
+/// and user behavior analytics. Provides separation of concerns from controller logic.
+/// Uses static storage for simplicity (shared across requests, resets on app restart).
+/// </summary>
 
 namespace PROGPOEDH.Services
 {
     public class EventServics
     {
-        public static Dictionary<string, List<LocalEvent>> eventsByCategory = new Dictionary<string, List<LocalEvent>>();
-        public static Dictionary<DateTime, List<LocalEvent>> eventsByDate = new Dictionary<DateTime, List<LocalEvent>>();
+        // =================== Core Storage ===================
+        public static Dictionary<string, List<LocalEvent>> eventsByCategory = new();
+        public static Dictionary<DateTime, List<LocalEvent>> eventsByDate = new();
 
-        public Stack<LocalEvent> stack => new Stack<LocalEvent>(EventsController.Events);
+        // =================== Search Analytics ===================
+        private static Dictionary<string, int> categorySearchCounts = new();
+        private static Dictionary<DateTime, int> dateSearchCounts = new();
+        private static Dictionary<string, int> titleSearchCounts = new(StringComparer.OrdinalIgnoreCase);
 
-        public void addEvent(LocalEvent localEvent)
+        // =================== Event Population ===================
+        public void PopulateEvents(List<LocalEvent> events)
         {
-            // add to global list
-            EventsController.Events.Add(localEvent);
-
-            // maintain category dictionary
-            if (!eventsByCategory.ContainsKey(localEvent.Category))
-                eventsByCategory[localEvent.Category] = new List<LocalEvent>();
-            eventsByCategory[localEvent.Category].Add(localEvent);
-
-            // maintain date dictionary (key is date only)
-            var dateKey = localEvent.Date.Date;
-            if (!eventsByDate.ContainsKey(dateKey))
-                eventsByDate[dateKey] = new List<LocalEvent>();
-            eventsByDate[dateKey].Add(localEvent);
-
-            // update controller sets (you currently hold sets in controller)
-            EventsController.uniqueCategories.Add(localEvent.Category);
-            EventsController.uniqueDates.Add(dateKey);
+            foreach (var e in events)
+            {
+                if (!eventsByCategory.ContainsKey(e.Category))
+                    eventsByCategory[e.Category] = new List<LocalEvent>();
+                eventsByCategory[e.Category].Add(e);
+                var dateKey = e.Date.Date;
+                if (!eventsByDate.ContainsKey(dateKey))
+                    eventsByDate[dateKey] = new List<LocalEvent>();
+                eventsByDate[dateKey].Add(e);
+            }
         }
 
-        public static Stack<LocalEvent> ConvertListToStack(List<LocalEvent> Events)
+        // =================== Dictionary/Stack/Queue Conversion ===================
+        public Dictionary<string, List<LocalEvent>> ConvertListToDictionary(List<LocalEvent> events)
         {
-            return new Stack<LocalEvent>(Events);
+            var dict = new Dictionary<string, List<LocalEvent>>();
+            foreach (var e in events)
+            {
+                if (!dict.ContainsKey(e.Category))
+                    dict[e.Category] = new List<LocalEvent>();
+                dict[e.Category].Add(e);
+            }
+            return dict;
         }
 
-        public List<LocalEvent> GetEventsByCategory(string category)
-        {
-            if (eventsByCategory.ContainsKey(category))
-                return eventsByCategory[category];
-            return new List<LocalEvent>();
-        }
+        public Stack<LocalEvent> ConvertListToStack(List<LocalEvent> events) =>
+            new Stack<LocalEvent>(events);
+
+        public List<LocalEvent> DisplayStack(Stack<LocalEvent> stack) =>
+            stack.ToList();
+
+        public Queue<LocalEvent> ConvertListToQueue(List<LocalEvent> events) =>
+            new Queue<LocalEvent>(events);
+
+        public List<LocalEvent> DisplayQueue(Queue<LocalEvent> queue) =>
+            queue.ToList();
+
+        // =================== Helpers ===================
+        /// <summary>
+        /// Extracts unique categories using HashSet for O(1) uniqueness checks.
+        /// LINQ Select projects events to categories, HashSet removes duplicates.
+        /// </summary>
+        public HashSet<string> GetUniqueCategories(List<LocalEvent> events) =>
+            new HashSet<string>(events.Select(e => e.Category));
+
+        /// <summary>
+        /// Extracts unique dates using SortedSet for automatic sorting and uniqueness.
+        /// Returns normalized dates (date-only) in ascending order.
+        /// </summary>
+
+        public SortedSet<DateTime> GetUniqueDates(List<LocalEvent> events) =>
+            new SortedSet<DateTime>(events.Select(e => e.Date.Date));
+
+        // =================== Search Methods ===================
         public List<LocalEvent> SearchEventsByTitle(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
                 return new List<LocalEvent>();
 
-            var qLower = query.Trim().ToLowerInvariant();
+            var all = eventsByCategory.Values.SelectMany(x => x).ToList();
+            return all.Where(e => e.Title.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
 
-            // Search the global Events list (case-insensitive substring)
-            return EventsController.Events
-                .Where(e => !string.IsNullOrEmpty(e.Title) && e.Title.ToLowerInvariant().Contains(qLower))
+        // =================== Simple Analytics ===================
+        public void RecordCategorySearch(string category)
+        {
+            if (string.IsNullOrEmpty(category)) return;
+            categorySearchCounts[category] = categorySearchCounts.GetValueOrDefault(category) + 1;
+        }
+
+        public void RecordDateSearch(DateTime date)
+        {
+            dateSearchCounts[date] = dateSearchCounts.GetValueOrDefault(date) + 1;
+        }
+
+        public void RecordTitleSearch(string title)
+        {
+            if (string.IsNullOrEmpty(title)) return;
+            titleSearchCounts[title] = titleSearchCounts.GetValueOrDefault(title) + 1;
+        }
+
+        // =================== Suggestion Algorithms ===================/// <summary>
+        /// Generates personalized event suggestions based on search history.
+        /// Algorithm:
+        /// 1. Identify top 3 most-searched categories and dates
+        /// 2. Filter events matching these patterns
+        /// 3. Return up to maxSuggestions distinct results
+        /// 4. Fallback to random selection if no search history
+        /// Time complexity: O(M log M + N) where M=unique searches, N=events
+        /// </summary>
+        public List<LocalEvent> SuggestEvents(int maxSuggestions = 5)
+        {
+            var allEvents = eventsByCategory.Values.SelectMany(x => x).ToList();
+
+            // Rank by what the user searches most often
+            var topCategories = categorySearchCounts
+                .OrderByDescending(kv => kv.Value)
+                .Take(3)
+                .Select(kv => kv.Key)
+                .ToHashSet();
+
+            var topDates = dateSearchCounts
+                .OrderByDescending(kv => kv.Value)
+                .Take(3)
+                .Select(kv => kv.Key)
+                .ToHashSet();
+
+            var suggestions = allEvents
+                .Where(e => topCategories.Contains(e.Category) || topDates.Contains(e.Date.Date))
+                .Distinct()
+                .Take(maxSuggestions)
+                .ToList();
+
+            // If no strong pattern yet, return random top 5
+            if (suggestions.Count == 0)
+                suggestions = allEvents.Take(maxSuggestions).ToList();
+
+            return suggestions;
+        }
+        // <summary>
+        /// Query-specific suggestions matching title or category patterns.
+        /// Simple containment search across title and category fields.
+        /// </summary>
+        public List<LocalEvent> SuggestBasedOnTitleQuery(string query, int max = 5)
+        {
+            var all = eventsByCategory.Values.SelectMany(x => x).ToList();
+            return all
+                .Where(e => e.Title.Contains(query, StringComparison.OrdinalIgnoreCase)
+                            || e.Category.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .Take(max)
                 .ToList();
         }
     }
 }
-/*using Microsoft.AspNetCore.Mvc;
-using PROGPOEDH.Controllers;
-using PROGPOEDH.Models;
-
-namespace PROGPOEDH.Services
-{
-    public class EventServics
-    {
-        public static Dictionary<string, List<LocalEvent>> eventsByCategory = new Dictionary<string, List<LocalEvent>>();
-
-        public Stack<LocalEvent> stack = new Stack<LocalEvent>(EventsController.Events);
-        *//*public void addEvent(LocalEvent localEvent)
-        {
-            EventsController.Events.Add(localEvent);
-
-            foreach (var item in EventsController.Events)
-            {
-                Console.WriteLine(item);
-            }
-        }*//*
-
-        public void addEvent(LocalEvent localEvent)
-        {
-            EventsController.Events.Add(localEvent);
-
-            // Group events by category using a dictionary
-            if (!eventsByCategory.ContainsKey(localEvent.Category))
-            {
-                eventsByCategory[localEvent.Category] = new List<LocalEvent>();
-            }
-
-            eventsByCategory[localEvent.Category].Add(localEvent);
-        }
-        public static Stack<LocalEvent> ConvertListToStack(List<LocalEvent> Events)
-        {
-            Stack<LocalEvent> stack = new Stack<LocalEvent>(Events);
-            return stack;
-        }
-
-        public static void DisplayStack(Stack<LocalEvent> eventStack)
-        {
-            Console.WriteLine("📦 Displaying all events from the stack:\n");
-            foreach (var ev in eventStack)
-            {
-                Console.WriteLine(ev);
-                Console.WriteLine(new string('-', 40));
-            }
-        }
-
-        public List<LocalEvent> GetEventsByCategory(string category)
-        {
-            if (eventsByCategory.ContainsKey(category))
-            {
-                return eventsByCategory[category];
-            }
-
-            return new List<LocalEvent>();
-        }
-
-        public SortedDictionary<DateTime, List<LocalEvent>> SortEventsByDate(List<LocalEvent> events)
-        {
-            SortedDictionary<DateTime, List<LocalEvent>> sortedEvents = new SortedDictionary<DateTime, List<LocalEvent>>();
-
-            foreach (var ev in events)
-            {
-                if (!sortedEvents.ContainsKey(ev.Date.Date))
-                {
-                    sortedEvents[ev.Date.Date] = new List<LocalEvent>();
-                }
-                sortedEvents[ev.Date.Date].Add(ev);
-            }
-
-            return sortedEvents;
-        }
-
-
-    }
-}
-*/

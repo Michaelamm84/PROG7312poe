@@ -1,4 +1,7 @@
 ﻿@model List<PROGPOEDH.Models.LocalEvent>
+@{
+    var selected = ViewBag.SelectedCategory as string;
+}
 
 <style>
     body {
@@ -12,15 +15,20 @@
         color: #4caf50;
     }
 
-    input, button {
+    h3 {
+        margin-top: 20px;
+        color: #03a9f4;
+    }
+
+    select, button {
         padding: 10px;
         border: none;
         border-radius: 6px;
         margin: 6px 0;
     }
 
-    input {
-        width: 250px;
+    select {
+        width: 270px;
         background-color: #1e1e1e;
         color: #fff;
     }
@@ -43,24 +51,33 @@
         padding: 8px;
         border-radius: 5px;
     }
-
-    h3 {
-        margin-top: 20px;
-        color: #03a9f4;
-    }
 </style>
 
-<h2>🔍 Search Events by Title</h2>
+<h2>🔍 Search Events by Category</h2>
 
-<form asp-controller="Events" asp-action="SearchTitle" method="get">
-    <input type="text" name="q" placeholder="Enter title..." required />
+<form asp-controller="Events" asp-action="SearchCategory" method="get">
+    <select name="category" required>
+        <option value="">-- Choose --</option>
+        @foreach (var c in (IEnumerable<string>)ViewBag.AllCategories)
+        {
+            if (c == selected)
+            {
+                <option value="@c" selected>@c</option>
+            }
+            else
+            {
+                <option value="@c">@c</option>
+            }
+        }
+    </select>
     <button type="submit">Search</button>
 </form>
 
-@if (ViewBag.Query != null)
+@if (!string.IsNullOrEmpty(selected))
 {
-    <h3>Results for "@ViewBag.Query"</h3>
-    @if (Model.Count > 0)
+    <h3>Results for "@selected"</h3>
+
+    @if (Model != null && Model.Count > 0)
     {
         <ul>
             @foreach (var e in Model)
@@ -71,17 +88,6 @@
     }
     else
     {
-        <p>No events found.</p>
+        <p>@ViewBag.Message ?? "No events found."</p>
     }
-}
-
-@if (ViewBag.Suggestions != null)
-{
-    <h3>✨ Suggested Events</h3>
-    <ul>
-        @foreach (var s in ViewBag.Suggestions as List<PROGPOEDH.Models.LocalEvent>)
-        {
-            <li><b>@s.Title</b> — @s.Category (@s.Date.ToShortDateString())</li>
-        }
-    </ul>
 }

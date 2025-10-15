@@ -1,8 +1,38 @@
-﻿@model Queue<LocalEvent>
-<h2>Events (queue option - newest first)</h2>
+﻿@model IEnumerable<PROGPOEDH.Models.LocalEvent>
+
+@{
+    ViewData["Title"] = "Events";
+}
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #181818;
+        color: #f5f5f5;
+        padding: 20px;
+    }
+
+    h2 {
+        color: #ffb74d;
+    }
+
+    li {
+        margin: 8px 0;
+        padding: 10px;
+        border-radius: 5px;
+        background: #252525;
+        color: #fff;
+    }
+
+        li:hover {
+            background-color: #333;
+        }
+</style>
+
+<h2>🎉 Events</h2>
 <ul>
-    @foreach (var e in Model)
+    @foreach (var e in Model ?? Enumerable.Empty<PROGPOEDH.Models.LocalEvent>())
     {
-        <li>@e.Title — @e.Date.ToShortDateString()</li>
+        <li><b>@e.Title</b> — @e.Category — @e.Date.ToShortDateString()</li>
     }
 </ul>

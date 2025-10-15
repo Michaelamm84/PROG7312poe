@@ -1,39 +1,177 @@
 ﻿@{
     ViewData["Title"] = "Events - Main";
+    Layout = "_Layout";
 }
 
-<h2>Events - Choose a View</h2>
+<style>
+    /* Full-page background */
+    .page-bg {
+        min-height: 100vh;
+        background-image: url('/images/cape-town.jpg'); /* You can replace this */
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 1rem;
+    }
 
-<div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px;">
-    <!-- ✅ Button to populate events -->
-    <form asp-controller="Events" asp-action="PopulateEvents" method="post">
-        <button type="submit" style="background-color:#28a745; color:white; padding:8px 15px; border:none; border-radius:5px;">
-            Populate Events
-        </button>
-    </form>
+    /* Glass card container */
+    .glass {
+        width: 100%;
+        max-width: 1000px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 1rem;
+        padding: 2.2rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color: #ffffff;
+    }
 
-    <form asp-controller="Events" asp-action="DisplayAllByCategory" method="get">
-        <button type="submit">View All (by Category)</button>
-    </form>
+        .glass h1, .glass h2, .glass h4 {
+            color: #fff;
+        }
 
-    <form asp-controller="Events" asp-action="DisplayByStack" method="get">
-        <button type="submit">View (Stack) — newest first</button>
-    </form>
+        .glass .lead {
+            color: rgba(255, 255, 255, 0.9);
+        }
 
-    <form asp-controller="Events" asp-action="DisplayByQueue" method="get">
-        <button type="submit">View (Queue) — newest first (queue option)</button>
-    </form>
+    .btn-action {
+        padding: 10px 16px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.15s ease, background-color 0.15s ease;
+    }
 
-    <form asp-controller="Events" asp-action="SearchCatagory" method="get">
-        <button type="submit">Search by Category</button>
-    </form>
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
 
-    <form asp-controller="Events" asp-action="SearchDate" method="get">
-        <button type="submit">Search by Date</button>
-    </form>
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
 
-    <form asp-controller="Events" asp-action="SearchByTitle" method="get">
-        <button type="submit">Search by Title</button>
-    </form>
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
 
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: black;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .actions-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 1.2rem;
+    }
+
+    .section-card {
+        margin-top: 2rem;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .small-note {
+        color: rgba(255,255,255,0.75);
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="page-bg">
+    <div class="glass">
+        <!-- Header -->
+        <div class="text-center mb-3">
+            <h1 class="fw-bold mb-1">@ViewData["Title"]</h1>
+            <p class="mb-0 small text-uppercase" style="letter-spacing:.12em; color: rgba(255,255,255,0.7);">
+                Event Management Dashboard
+            </p>
+        </div>
+
+        <div class="px-1">
+            <p class="lead">
+                This panel allows you to populate demo events, view them in different data structure orders (Stack, Queue, Dictionary),
+                and perform search operations by category, date, or title. It’s designed to demonstrate basic data structures and search analysis logic.
+            </p>
+        </div>
+
+        <!-- Populate Section -->
+        <div class="section-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h4 class="mb-1">Populate Events</h4>
+                    <p class="small-note">
+                        Seeds the system with demo events. This will populate the service dictionaries and allow viewing by Stack, Queue, and more.
+                    </p>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">Initial Setup</small>
+                </div>
+            </div>
+
+            <form asp-controller="Events" asp-action="PopulateEvents" method="post" class="mt-3">
+                <button type="submit" class="btn-action btn-success">
+                    🌱 Populate Events
+                </button>
+            </form>
+
+            <small class="small-note d-block mt-2">Tip: populates data in memory, not persisted in a database.</small>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="section-card">
+            <h4 class="mb-2">Available Views</h4>
+            <div class="actions-grid">
+                <form asp-controller="Events" asp-action="DisplayAllByCategory" method="get">
+                    <button type="submit" class="btn-action btn-primary">📂 View All (by Category)</button>
+                </form>
+
+                <form asp-controller="Events" asp-action="DisplayByStack" method="get">
+                    <button type="submit" class="btn-action btn-secondary">🗂️ View (Stack)</button>
+                </form>
+
+                <form asp-controller="Events" asp-action="DisplayByQueue" method="get">
+                    <button type="submit" class="btn-action btn-warning">🕓 View (Queue)</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="section-card">
+            <h4 class="mb-2">Search Options</h4>
+            <div class="actions-grid">
+                <form asp-controller="Events" asp-action="SearchCategory" method="get">
+                    <button type="submit" class="btn-action btn-primary">🔍 Search by Category</button>
+                </form>
+
+                <form asp-controller="Events" asp-action="SearchDate" method="get">
+                    <button type="submit" class="btn-action btn-secondary">📅 Search by Date</button>
+                </form>
+
+                <form asp-controller="Events" asp-action="SearchTitle" method="get">
+                    <button type="submit" class="btn-action btn-success">📝 Search by Title</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

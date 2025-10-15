@@ -5,341 +5,226 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Controller responsible for handling HTTP requests related to local community events.
+/// Manages event display, search operations, and data structure demonstrations (Stack, Queue, Dictionary).
+/// </summary>
+
 namespace PROGPOEDH.Controllers
+
 {
     public class EventsController : Controller
     {
-        public static List<LocalEvent> Events = new List<LocalEvent>();
-        public EventServics EventServics = new EventServics();
 
-        // sets for unique values (you already had these)
-        public static HashSet<string> uniqueCategories = new HashSet<string>();
-        public static SortedSet<DateTime> uniqueDates = new SortedSet<DateTime>();
 
-        // ---------------- Populate (keeps all structures in sync) ----------------
-        public IActionResult PopulateEvents()
+        /// <summary>
+        /// Static in-memory storage for all events. Shared across requests but resets on app restart.
+        /// Initialized with sample data on first load.
+        /// </summary>
+        
+        private static List<LocalEvent> Events = new List<LocalEvent>();
+        private EventServics _eventService;
+
+        public EventsController()
         {
-            Events.Clear();
-            EventServics.eventsByCategory.Clear();
-            EventServics.eventsByDate.Clear();
-            uniqueCategories.Clear();
-            uniqueDates.Clear();
+            _eventService ??= new EventServics();
 
-            Events.AddRange(new List<LocalEvent>
+            // Populate on first load if empty
+            if (!Events.Any())
             {
-                new LocalEvent { Id = 1, Title = "Tree Planting Drive", Category = "Environmental", Date = DateTime.Now.AddDays(3), Priority = 2 },
-                new LocalEvent { Id = 2, Title = "Community Cleanup", Category = "Community", Date = DateTime.Now.AddDays(7), Priority = 1 },
-                new LocalEvent { Id = 3, Title = "Charity Fun Run", Category = "Sports", Date = DateTime.Now.AddDays(10), Priority = 3 },
-                new LocalEvent { Id = 4, Title = "Food Donation Drive", Category = "Charity", Date = DateTime.Now.AddDays(5), Priority = 2 },
-                new LocalEvent { Id = 5, Title = "Art Exhibition", Category = "Arts", Date = DateTime.Now.AddDays(14), Priority = 4 },
-                new LocalEvent { Id = 6, Title = "Coding Workshop", Category = "Education", Date = DateTime.Now.AddDays(12), Priority = 3 },
-                new LocalEvent { Id = 7, Title = "Fundraising Gala", Category = "Charity", Date = DateTime.Now.AddDays(9), Priority = 1 },
-                new LocalEvent { Id = 8, Title = "Sports Day", Category = "Sports", Date = DateTime.Now.AddDays(2), Priority = 4 },
-                new LocalEvent { Id = 9, Title = "Volunteer Meetup", Category = "Community", Date = DateTime.Now.AddDays(6), Priority = 2 },
-                new LocalEvent { Id = 10, Title = "Environmental Awareness Talk", Category = "Environmental", Date = DateTime.Now.AddDays(15), Priority = 3 }
-            });
-
-            // populate dictionaries and sets
-            foreach (var e in Events)
-            {
-                // categories/dictionary
-                if (!EventServics.eventsByCategory.ContainsKey(e.Category))
-                    EventServics.eventsByCategory[e.Category] = new List<LocalEvent>();
-                EventServics.eventsByCategory[e.Category].Add(e);
-
-                // dates dict & sets
-                var d = e.Date.Date;
-                if (!EventServics.eventsByDate.ContainsKey(d))
-                    EventServics.eventsByDate[d] = new List<LocalEvent>();
-                EventServics.eventsByDate[d].Add(e);
-
-                uniqueCategories.Add(e.Category);
-                uniqueDates.Add(d);
+                PopulateEvents();
             }
-
-            return View("Views/Events/EventIndex.cshtml");
         }
 
-        // ---------------- View all (dictionary) ----------------
+        // -------------------- Populate Events --------------------
+        /// <summary>
+        /// HTTP POST action to initialize and populate the events collection with sample data.
+        /// Populates both the main list and service dictionaries (category/date groupings).
+        /// </summary
+
+        [HttpPost]
+        public IActionResult PopulateEvents()
+        {
+            _eventService ??= new EventServics();
+
+            Events = new List<LocalEvent>
+            {
+                new LocalEvent { Id = 1, Title = "Tree Planting Drive", Category = "Environmental", Date = DateTime.Now.AddDays(3), Priority = 2, Description = "Plant trees in community park." },
+                new LocalEvent { Id = 2, Title = "Community Cleanup", Category = "Community", Date = DateTime.Now.AddDays(7), Priority = 1, Description = "Litter pick and recycle." },
+                new LocalEvent { Id = 3, Title = "Charity Fun Run", Category = "Sports", Date = DateTime.Now.AddDays(10), Priority = 3, Description = "5k for local charities." },
+                new LocalEvent { Id = 4, Title = "Food Donation Drive", Category = "Charity", Date = DateTime.Now.AddDays(5), Priority = 2, Description = "Collect non-perishables." },
+                new LocalEvent { Id = 5, Title = "Art Exhibition", Category = "Arts", Date = DateTime.Now.AddDays(14), Priority = 4, Description = "Local artists display work." },
+                new LocalEvent { Id = 6, Title = "Coding Workshop", Category = "Education", Date = DateTime.Now.AddDays(12), Priority = 3, Description = "Intro to C# workshop." },
+                new LocalEvent { Id = 7, Title = "Fundraising Gala", Category = "Charity", Date = DateTime.Now.AddDays(9), Priority = 1, Description = "Evening fundraiser." },
+                new LocalEvent { Id = 8, Title = "Sports Day", Category = "Sports", Date = DateTime.Now.AddDays(2), Priority = 4, Description = "School sports activities." },
+                new LocalEvent { Id = 9, Title = "Volunteer Meetup", Category = "Community", Date = DateTime.Now.AddDays(6), Priority = 2, Description = "Network and plan." },
+                new LocalEvent { Id = 10, Title = "Environmental Awareness Talk", Category = "Environmental", Date = DateTime.Now.AddDays(15), Priority = 3, Description = "Talk on sustainability." },
+                new LocalEvent { Id = 11, Title = "Beach Cleanup", Category = "Environmental", Date = DateTime.Now.AddDays(18), Priority = 1, Description = "Join volunteers to clean the beachfront." },
+new LocalEvent { Id = 12, Title = "Neighborhood Safety Workshop", Category = "Community", Date = DateTime.Now.AddDays(21), Priority = 3, Description = "Learn about community safety practices." },
+new LocalEvent { Id = 13, Title = "Charity Bake Sale", Category = "Charity", Date = DateTime.Now.AddDays(25), Priority = 2, Description = "Sell baked goods to raise funds for local shelters." },
+new LocalEvent { Id = 14, Title = "Art in the Park", Category = "Arts", Date = DateTime.Now.AddDays(17), Priority = 4, Description = "Outdoor art exhibition and live painting demos." },
+new LocalEvent { Id = 15, Title = "Recycling Workshop", Category = "Environmental", Date = DateTime.Now.AddDays(20), Priority = 2, Description = "Learn effective recycling and composting." },
+new LocalEvent { Id = 16, Title = "Book Donation Drive", Category = "Charity", Date = DateTime.Now.AddDays(27), Priority = 3, Description = "Donate books for underprivileged schools." },
+new LocalEvent { Id = 17, Title = "Local Football Tournament", Category = "Sports", Date = DateTime.Now.AddDays(23), Priority = 1, Description = "Amateur teams compete in a friendly tournament." },
+new LocalEvent { Id = 18, Title = "Community Talent Show", Category = "Community", Date = DateTime.Now.AddDays(16), Priority = 4, Description = "Showcase talents from all age groups." },
+new LocalEvent { Id = 19, Title = "Photography Exhibition", Category = "Arts", Date = DateTime.Now.AddDays(19), Priority = 2, Description = "Exhibit of nature and street photography." },
+new LocalEvent { Id = 20, Title = "STEM Education Fair", Category = "Education", Date = DateTime.Now.AddDays(30), Priority = 3, Description = "Interactive exhibits promoting science learning." },
+
+            };
+
+            _eventService.PopulateEvents(Events);
+
+
+            return View("Views/Events/EventIndex.cshtml", Events); 
+        }
+
+        // -------------------- Main Page (Hub) --------------------
+        /// <summary>
+        /// HTTP GET action serving as the events index.
+        /// Displays all available event related actions
+        /// </summary>
+        [HttpGet]
+        public IActionResult Main()
+        {
+            ViewBag.Message = TempData["Message"];
+            return View("Views/Events/EventIndex.cshtml", Events);
+        }
+
+        // -------------------- Display Views --------------------
+        /// <summary>
+        /// Displays events grouped by category using Dictionary data structure.
+        /// Leverages pre-populated eventsByCategory dictionary for O(1) lookups.
+        /// </summary>
+
+        [HttpGet]
         public IActionResult DisplayAllByCategory()
         {
-            // Pass the dictionary straight to the view
+            if (!EventServics.eventsByCategory.Any())
+                _eventService.PopulateEvents(Events);
+
             return View("Views/Events/DisplayByCategory.cshtml", EventServics.eventsByCategory);
         }
 
-        // ---------------- Stack (LIFO) - newest first ----------------
+        /// <summary>
+        /// Demonstrates Stack (LIFO) data structure by converting events list to stack.
+        /// Events are processed in reverse order (last in, first out) Allows users to see past created events in the order of how long ago they were made.
+        /// </summary>
+        /// 
+
+
+        [HttpGet]
         public IActionResult DisplayByStack()
         {
-            var stack = EventServics.ConvertListToStack(Events); // LIFO
-            return View("Views/Events/DisplayByStack.cshtml", stack);
+            // Order oldest -> newest, then push so pop returns newest first (LIFO)
+            var orderedOldestFirst = Events.OrderBy(e => e.Date).ToList();
+
+            var stack = _eventService.ConvertListToStack(orderedOldestFirst);
+            var stackedList = _eventService.DisplayStack(stack);
+
+            return View("Views/Events/DisplayByStack.cshtml", stackedList);
         }
 
-        // ---------------- Queue option (we'll enqueue such that dequeue gives newest->oldest) ----------------
-        // You asked to keep "queues" as an option to see events from recently created -> oldest.
-        // To make a queue produce that order we enqueue events ordered by Date descending.
+
+        /// <summary>
+        /// Demonstrates Queue (FIFO) data structure with events ordered by date (most recent first).
+        /// Allows users to see most recently created events.
+        /// </summary>
+        /// <returns>Queue-based event display view</returns>
+        /// 
+
+        [HttpGet]
         public IActionResult DisplayByQueue()
         {
-            var orderedRecentFirst = Events.OrderByDescending(e => e.Date).ToList();
-            var q = new Queue<LocalEvent>(orderedRecentFirst); // first dequeued = most recent
-            return View("Views/Events/DisplayByQueue.cshtml", q);
+            // Order oldest -> newest, enqueue in that order so dequeue returns oldest first (FIFO)
+            var orderedOldestFirst = Events.OrderBy(e => e.Date).ToList();
+
+            var queue = _eventService.ConvertListToQueue(orderedOldestFirst);
+            var queuedList = _eventService.DisplayQueue(queue);
+
+            return View("Views/Events/DisplayByQueue.cshtml", queuedList);
         }
 
-        // ---------------- Search by Category (uses set for choices and dictionary for lookup) ----------------
+      
+
+        // -------------------- Search by Category --------------------
+        /// <summary>
+        /// Searches events by category using pre-built Dictionary lookup.
+        /// Records search analytics and provides personalized suggestions.
+        /// </summary>
         [HttpGet]
-        public IActionResult SearchCatagory(string category)
+        public IActionResult SearchCategory(string category)
         {
-            ViewBag.AllCategories = uniqueCategories; // set shows unique category choices
+            ViewBag.AllCategories = _eventService.GetUniqueCategories(Events);
 
             if (string.IsNullOrEmpty(category))
-                return View("Views/Events/SearchCatagory.cshtml", new List<LocalEvent>());
-
-            if (EventServics.eventsByCategory.ContainsKey(category))
             {
-                ViewBag.SelectedCategory = category;
-                return View("Views/Events/SearchCatagory.cshtml", EventServics.eventsByCategory[category]);
+                ViewBag.Suggestions = _eventService.SuggestEvents(5);
+                return View("Views/Events/SearchCategory.cshtml", new List<LocalEvent>());
             }
 
-            ViewBag.Message = "No events found for that category.";
-            return View("Views/Events/SearchCatagory.cshtml", new List<LocalEvent>());
+            _eventService.RecordCategorySearch(category);
+
+            var results = EventServics.eventsByCategory.ContainsKey(category)
+                ? EventServics.eventsByCategory[category]
+                : new List<LocalEvent>();
+
+            ViewBag.SelectedCategory = category;
+            ViewBag.Suggestions = _eventService.SuggestEvents(5);
+
+            return View("Views/Events/SearchCategory.cshtml", results);
         }
 
-        // ---------------- Search by Date (uses uniqueDates set + eventsByDate dict) ----------------
+        // -------------------- Search by Date --------------------
+        /// <summary>
+        /// Searches events by specific date using normalized DateTime dictionary keys.
+        /// Supports date-only searches (ignores time component).
+        /// </summary>
         [HttpGet]
         public IActionResult SearchDate(DateTime? date)
         {
-            ViewBag.AllDates = uniqueDates; // set of unique dates
-            if (!date.HasValue)
-                return View("Views/Events/SearchDate.cshtml", new List<LocalEvent>());
+            ViewBag.AllDates = _eventService.GetUniqueDates(Events);
 
-            var key = date.Value.Date;
-            if (EventServics.eventsByDate.ContainsKey(key))
+            if (!date.HasValue)
             {
-                ViewBag.SelectedDate = key.ToShortDateString();
-                return View("Views/Events/SearchDate.cshtml", EventServics.eventsByDate[key]);
+                ViewBag.Suggestions = _eventService.SuggestEvents(5);
+                return View("Views/Events/SearchDate.cshtml", new List<LocalEvent>());
             }
 
-            ViewBag.Message = "No events on that date.";
-            return View("Views/Events/SearchDate.cshtml", new List<LocalEvent>());
+            var key = date.Value.Date;
+            _eventService.RecordDateSearch(key);
+
+            var results = EventServics.eventsByDate.ContainsKey(key)
+                ? EventServics.eventsByDate[key]
+                : new List<LocalEvent>();
+
+            ViewBag.SelectedDate = key.ToShortDateString();
+            ViewBag.Suggestions = _eventService.SuggestEvents(5);
+
+            return View("Views/Events/SearchDate.cshtml", results);
         }
 
-
-
-      // search by title 
-
+        // -------------------- Search by Title --------------------
+        /// <summary>
+        /// Performs case-insensitive title search using LINQ filtering.
+        /// Provides query-based suggestions and records search analytics.
+        /// </summary>
         [HttpGet]
-        public IActionResult SearchByTitle(string q)
+        public IActionResult SearchTitle(string q)
         {
-            // If no query provided, show the empty search form
             if (string.IsNullOrWhiteSpace(q))
             {
+                ViewBag.Suggestions = _eventService.SuggestEvents(5);
                 return View("Views/Events/SearchByTitle.cshtml", new List<LocalEvent>());
             }
 
-            // Use the service to search
-            var results = EventServics.SearchEventsByTitle(q);
+            _eventService.RecordTitleSearch(q);
+            var results = _eventService.SearchEventsByTitle(q);
 
             ViewBag.Query = q;
+            ViewBag.Suggestions = _eventService.SuggestBasedOnTitleQuery(q, 5);
+
             return View("Views/Events/SearchByTitle.cshtml", results);
         }
-
     }
 }
-/*using Microsoft.AspNetCore.Http.Connections;
-using Microsoft.AspNetCore.Mvc;
-using PROGPOEDH.Models;
-using PROGPOEDH.Services;
 
-namespace PROGPOEDH.Controllers
-{
-    public class EventsController : Controller
-    {
-        public static List<LocalEvent> Events = new List<LocalEvent>();
-        public EventServics EventServics = new EventServics();
-        public static HashSet<string> uniqueCategories = new HashSet<string>();
-        public static SortedSet<DateTime> uniqueDates = new SortedSet<DateTime>();
-
-
-        public IActionResult SubmitEvent (LocalEvent localEvent){
-
-            EventServics eventServics = new EventServics();
-            eventServics.addEvent(localEvent);
-            //Console.WriteLine(localEvent);
-            return View("Views/Events/EventIndex.cshtml");
-        }
-
-
-
-
-
-
-
-
-        //last in first out (LIFO)
-        public IActionResult DisplayEvent()
-        {
-            var stack = EventServics.ConvertListToStack(Events);
-
-            // Display most recent event first
-            ViewBag.RecentEvent = stack.Peek(); // top of the stack
-            return View("Views/Events/DisplayEvents.cshtml", stack);
-        }
-
-
-
-
-
-
-
-
-        public IActionResult Search()
-        {
-            return View("Views/Events/Search.cshtml");
-        }
-
-        public IActionResult UniqueValues()
-        {
-            ViewBag.Categories = uniqueCategories;
-            ViewBag.Dates = uniqueDates;
-            return View("Views/Events/UniqueValues.cshtml");
-        }
-
-
-
-
-        [HttpGet]
-        public IActionResult FilterByCategory(string category)
-        {
-            if (string.IsNullOrEmpty(category))
-            {
-                // Show all categories
-                ViewBag.AllCategories = EventServics.eventsByCategory.Keys;
-                return View("Views/Events/SearchCatagory.cshtml", new List<LocalEvent>());
-            }
-
-            // Filter specific category
-            if (EventServics.eventsByCategory.ContainsKey(category))
-            {
-                var filteredEvents = EventServics.eventsByCategory[category];
-                ViewBag.SelectedCategory = category;
-                ViewBag.AllCategories = EventServics.eventsByCategory.Keys;
-                return View("Views/Events/SearchCatagory.cshtml", filteredEvents);
-            }
-
-            ViewBag.Message = "No events found for that category.";
-            ViewBag.AllCategories = EventServics.eventsByCategory.Keys;
-            return View("Views/Events/SearchCatagory.cshtml", new List<LocalEvent>());
-        }
-
-        /// <summary>
-        /// Dates 
-        /// </summary>
-        /// <returns></returns>
-        public IActionResult DisplayUniqueDates()
-        {
-            return View("Views/Events/SearchDate.cshtml", uniqueDates);
-        }
-
-        [HttpGet]
-        public IActionResult SearchByDate(DateTime? date)
-        {
-            // Create hash table for dates
-            var eventsByDate = new System.Collections.Hashtable();
-
-            foreach (var e in Events)
-            {
-                if (!eventsByDate.ContainsKey(e.Date.Date))
-                    eventsByDate[e.Date.Date] = new List<LocalEvent>();
-
-                ((List<LocalEvent>)eventsByDate[e.Date.Date]).Add(e);
-            }
-
-            // If a date was provided, show only that date’s events
-            if (date.HasValue)
-            {
-                if (eventsByDate.ContainsKey(date.Value.Date))
-                {
-                    var selectedEvents = (List<LocalEvent>)eventsByDate[date.Value.Date];
-                    ViewBag.SelectedDate = date.Value.ToShortDateString();
-                    return View("Views/Events/SearchDate.cshtml", selectedEvents);
-                }
-                else
-                {
-                    ViewBag.SelectedDate = date.Value.ToShortDateString();
-                    ViewBag.Message = "No events found for this date.";
-                    return View("Views/Events/SearchDate.cshtml", new List<LocalEvent>());
-                }
-            }
-
-            // Default: show search form
-            return View("Views/Events/SearchDate.cshtml", null);
-        }
-  
-        /// /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-       
-        *//*  public IActionResult FilterByCategory(string category)
-          {
-              var filteredEvents = EventServics.GetEventsByCategory(category);
-              return View("Views/Events/DisplayEvents.cshtml", filteredEvents);
-          }
-
-  *//*
-
-        public IActionResult PopulateEvents()
-        {
-            // Optional: clear existing data to avoid duplicates
-            Events.Clear();
-            EventServics.eventsByCategory.Clear();
-
-            // Create and populate events directly into the global list
-            Events.AddRange(new List<LocalEvent>
-    {
-        new LocalEvent { Id = 1, Title = "Tree Planting Drive", Category = "Environmental", Date = DateTime.Now.AddDays(3), Priority = 2 },
-        new LocalEvent { Id = 2, Title = "Community Cleanup", Category = "Community", Date = DateTime.Now.AddDays(7), Priority = 1 },
-        new LocalEvent { Id = 3, Title = "Charity Fun Run", Category = "Sports", Date = DateTime.Now.AddDays(10), Priority = 3 },
-        new LocalEvent { Id = 4, Title = "Food Donation Drive", Category = "Charity", Date = DateTime.Now.AddDays(5), Priority = 2 },
-        new LocalEvent { Id = 5, Title = "Art Exhibition", Category = "Arts", Date = DateTime.Now.AddDays(14), Priority = 4 },
-        new LocalEvent { Id = 6, Title = "Coding Workshop", Category = "Education", Date = DateTime.Now.AddDays(12), Priority = 3 },
-        new LocalEvent { Id = 7, Title = "Fundraising Gala", Category = "Charity", Date = DateTime.Now.AddDays(9), Priority = 1 },
-        new LocalEvent { Id = 8, Title = "Sports Day", Category = "Sports", Date = DateTime.Now.AddDays(2), Priority = 4 },
-        new LocalEvent { Id = 9, Title = "Volunteer Meetup", Category = "Community", Date = DateTime.Now.AddDays(6), Priority = 2 },
-        new LocalEvent { Id = 10, Title = "Environmental Awareness Talk", Category = "Environmental", Date = DateTime.Now.AddDays(15), Priority = 3 }
-    });
-
-            // Add events to hash table (dictionary) by category
-            foreach (var e in Events)
-            {
-                // Add to dictionary by category
-                if (!EventServics.eventsByCategory.ContainsKey(e.Category))
-                {
-                    EventServics.eventsByCategory[e.Category] = new List<LocalEvent>();
-                }
-                EventServics.eventsByCategory[e.Category].Add(e);
-
-                // Add unique category and date to sets
-                uniqueCategories.Add(e.Category);
-                uniqueDates.Add(e.Date.Date);
-            }
-            // Debug check (optional, helps show the dictionary integration)
-            Console.WriteLine("✅ Events populated and categorized successfully!");
-            foreach (var category in EventServics.eventsByCategory.Keys)
-            {
-                Console.WriteLine($"Category: {category} - {EventServics.eventsByCategory[category].Count} event(s)");
-            }
-
-            return View("Views/Events/EventIndex.cshtml");
-        }
-
-
-        
-          
-
-  
-
-
-
-
-
-
-    }
-}
-*/
